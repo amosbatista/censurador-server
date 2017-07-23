@@ -4,6 +4,7 @@ var logSrv = function(param){
 
 	return {
 		write: function(text){
+			console.log(text);
 			log.info(text);
 		}
 	}

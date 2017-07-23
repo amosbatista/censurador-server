@@ -16,13 +16,12 @@ serverSrv({
 
 		var io = ioSrv(server);
 
-		console.log("server has just openned.");
 		log.write("server has just openned.");
 
 		var censorDataBaseModule = require("./censorDatabase_MySQL")(config.database);
 
 		var censorProcessorsModules = config.censorProcessors.process.reduce(function(_finalObject, _processConfig){
-			_finalObject[_processConfig.name] = require(censorProcessorsFolder + _processConfig.module);
+			_finalObject[_processConfig.name] = require(censorProcessorsFolder + _processConfig.module)();
 			return _finalObject;
 		}, {});
 		
@@ -99,18 +98,11 @@ serverSrv({
 						}).then(function(){
 							resultProcess();	
 						}).catch(function(err){
-							console.log("Error at song save into database: ", err);
 							log.write("Error at song save into database: " + err);			
-						})
-
-
-
-
-						
+						});
 					});
 				};
 			}).catch(function(err){
-				console.log("Error at song load from database: ", err);
 				log.write("Error at song load from database: " + err);
 			});
 		});
