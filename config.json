@@ -1,10 +1,18 @@
 {
 	"general": {
-		"port": 3000
+		"port": 3000,
+		"logPath": "log"
 	},
 
 	"api": {
 		"configFile": "config/vagalume.json"
+	},
+
+	"database": {
+		"host": "localhost",
+		"database": "censor",
+		"user": "root",
+		"password": "amos"
 	},
 
 	"censorProcessors": {

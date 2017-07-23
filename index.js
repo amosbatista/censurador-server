@@ -3,20 +3,23 @@ var config = require("./config");
 var serverSrv = require('./httpServer');
 var request = require('./httpServer');
 var ioSrv = require('./socketIo');
+var Log = require('./logSrv');
 
 var censorProcessorsFolder = "censors/";
 
+log = new Log(config.general);
 
 serverSrv({
 	port: config.general.port,
 
 	atStart: function(server){
-		console.log("server has just openned.");
 
 		var io = ioSrv(server);
-		console.log("socket has just started.");
 
-		var censorDataBaseModule = require("./censorDatabase_MySQL");
+		console.log("server has just openned.");
+		log.write("server has just openned.");
+
+		var censorDataBaseModule = require("./censorDatabase_MySQL")(config.database);
 
 		var censorProcessorsModules = config.censorProcessors.process.reduce(function(_finalObject, _processConfig){
 			_finalObject[_processConfig.name] = require(censorProcessorsFolder + _processConfig.module);
@@ -29,31 +32,9 @@ serverSrv({
 
 			var censorResultList = [];
 
-			censorDataBaseModule.loadSongFromAPI({
-				apiId: songData.apiID
-			}).then(function(songFromDatabase){
+			var resultProcess = function(){
 
-				if(songFromDatabase){
-
-					songFromDatabase.loadedCensorResult.forEach(function(_censorResult){
-						censorResultList.push(censorProcessorsModules[_censorResult.name].loadFromResult(_censorResult.resultId));
-					});
-				}
-				else{
-
-					var songAPI = require('./vagalumeAPI')(config.api);
-
-					songAPI.loadSong(songData).then(function(songFromAPI){
-
-						censorProcessorsModules.forEach(function(_censorProcessor){
-							censorResultList.push(_censorProcessor.filter(songFromAPI));
-						});
-
-					});
-				};
-
-				var theSong = songFromDatabase || songFromAPI;
-
+				var theSong = songFromDatabase.theSong || songFromAPI;
 
 				var censorResult = censorResultList.reduce(function(_censorResult, censor){
 					_censorResult.totalVowsToCensor = _censorResult.totalVowsToCensor || 0;
@@ -86,10 +67,53 @@ serverSrv({
 				censorResult.theSong = theSong;
 
 				io.emit(config.censorProcessors.events.showTheResult, censorResult);
-			})
+			};
+
+
+			censorDataBaseModule.loadSong({
+				idAPI: songData.apiID
+			}).then(function(songFromDatabase){
+
+				if(songFromDatabase){
+
+					songFromDatabase.loadedCensorResult.forEach(function(_censorResult){
+						censorResultList.push(censorProcessorsModules[_censorResult.name].loadFromResult(_censorResult.resultId));
+					});
+
+					resultProcess();
+				}
+				else{
+
+					var songAPI = require('./vagalumeAPI')(config.api);
+
+					songAPI.loadSong(songData).then(function(songFromAPI){
+
+						censorProcessorsModules.forEach(function(_censorProcessor){
+							censorResultList.push(_censorProcessor.filter(songFromAPI));
+						});
+
+						censorDataBaseModule.saveSong({
+							songName: songFromAPI.name,
+							idAPI: songFromAPI.idAPI,
+							censorResultList: censorResultList
+						}).then(function(){
+							resultProcess();	
+						}).catch(function(err){
+							console.log("Error at song save into database: ", err);
+							log.write("Error at song save into database: " + err);			
+						})
+
+
+
+
+						
+					});
+				};
+			}).catch(function(err){
+				console.log("Error at song load from database: ", err);
+				log.write("Error at song load from database: " + err);
+			});
 		});
-
-
 	},
 	atRequest: function(req, resp){
 	}
