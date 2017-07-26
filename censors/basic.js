@@ -12,16 +12,16 @@ var service = function(){
 
 	];
 
-	return: {
+	return {
 		loadFromResult: function(id){
 
 			return censorStatus.find(function(status){
 				return status.id == id;
 			});
 		},
-		filter: function(liric){
+		filter: function(song){
 
-			if(liric.search('amor') > 0)
+			if(song.lirics.search('amor') > 0)
 				return censorStatus[1];
 			else
 				return censorStatus[0];
@@ -30,4 +30,4 @@ var service = function(){
 	}
 }
 
-module.exports(service);
+module.exports = service;

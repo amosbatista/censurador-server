@@ -6,19 +6,12 @@ var dbService = function(config){
 	connection.connect();
 
 	/* Check table creation */
-	var baseCommand = 'CREATE TABLE IF NOT EXIST censorResult_Process (';
-	baseCommand = baseCommand + 'idCensor VARCHAR NOT NULL,'
-	baseCommand = baseCommand + 'processName VARCHAR NOT NULL,'
-	baseCommand = baseCommand + 'idCensorResult INT NOT NULL);'
+	var baseCommand = 'CREATE TABLE IF NOT EXISTS censorResultProcess (idCensor VARCHAR(50) NOT NULL, processName VARCHAR(50) NOT NULL, idCensorResult INT NOT NULL);'
 
 	connection.query(baseCommand, function (error, results, fields) {
 		if (error) throw error;
 		
-		baseCommand = 'CREATE TABLE IF NOT EXIST censorResult (';
-		baseCommand = baseCommand + 'idCensor VARCHAR NOT NULL,'
-		baseCommand = baseCommand + 'idApi INT NOT NULL,'
-		baseCommand = baseCommand + 'songName INT NOT NULL,'
-		baseCommand = baseCommand + 'censorDate DATETIME NOT NULL);'
+		baseCommand = 'CREATE TABLE IF NOT EXISTS censorResult (idCensor VARCHAR(50) NOT NULL,idApi INT NOT NULL,songName INT NOT NULL,censorDate DATETIME NOT NULL);'
 
 		connection.query(baseCommand, function (error, results, fields) {
 			if (error) throw error;
@@ -37,7 +30,7 @@ var dbService = function(config){
 					var connection = mysql.createConnection();
 					connection.connect();
 
-					var command = "SELECT P.processName, P.idCensorResult, P.songName FROM censorResult R INNER JOIN censorResult_Process P ON P.idCensor = R.idCensor  WHERE R.idApi = ?";
+					var command = "SELECT P.processName, P.idCensorResult, P.songName FROM censorResult R INNER JOIN censorResultProcess P ON P.idCensor = R.idCensor  WHERE R.idApi = ?";
 					connection.query(command, [
 						params.idApi
 					], function (error, results, fields) {
@@ -90,16 +83,16 @@ var dbService = function(config){
 								idCensor,
 								params.idApi,
 								params.songName,		
-								currentDate.toString();
+								currentDate.toString()
 							], function (error, results, fields) {
 								if(error)
 									reject(error);
-							};
+							}
 						);
 
 						params.censorResultList.forEach(function(censorResult){
 							connection.query(
-								'INSERT INTO censorResult_Process (idCensor, processName, idCensorResult) VALUES (?, ?, ?)',
+								'INSERT INTO censorResultProcess (idCensor, processName, idCensorResult) VALUES (?, ?, ?)',
 								[
 									idCensor,
 									censorResult.processName,
@@ -108,7 +101,7 @@ var dbService = function(config){
 								, function (error, results, fields) {
 									if(error)
 										reject(error);
-								};
+								}
 							);
 						}, '');
 

@@ -5,7 +5,8 @@
 	},
 
 	"api": {
-		"configFile": "config/vagalume.json"
+		"configFile": "config/vagalume.json",
+		"apiKey": "670d06d80b6831b48c9de5fb54ff7799"
 	},
 
 	"database": {

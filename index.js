@@ -1,11 +1,10 @@
 var config = require("./config");
 
 var serverSrv = require('./httpServer');
-var request = require('./httpServer');
 var ioSrv = require('./socketIo');
 var Log = require('./logSrv');
 
-var censorProcessorsFolder = "censors/";
+var censorProcessorsFolder = "./censors/";
 
 log = new Log(config.general);
 
@@ -85,7 +84,10 @@ serverSrv({
 
 					var songAPI = require('./vagalumeAPI')(config.api);
 
-					songAPI.loadSong(songData).then(function(songFromAPI){
+					songAPI.loadSong({
+						songName: songData.songNname,
+						artistName: songData.artistName,
+					}).then(function(songFromAPI){
 
 						censorProcessorsModules.forEach(function(_censorProcessor){
 							censorResultList.push(_censorProcessor.filter(songFromAPI));
