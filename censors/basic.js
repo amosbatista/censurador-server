@@ -2,12 +2,14 @@ var service = function(){
 
 	const censorStatus = [
 		{
-			id: 0,
-			feedBack: 'Nothing wrong'
+			idCensorResult: 0,
+			feedBack: 'Nothing wrong',
+			vowToCensor: false
 		},
 		{
-			id: 1,
-			feedBack: "There's 'amor' word. I hate love, censor."
+			idCensorResult: 1,
+			feedBack: "There's 'amor' word. I hate love, censor.",
+			vowToCensor: true
 		},
 
 	];
@@ -16,7 +18,7 @@ var service = function(){
 		loadFromResult: function(id){
 
 			return censorStatus.find(function(status){
-				return status.id == id;
+				return status.idCensorResult == id;
 			});
 		},
 		filter: function(song){

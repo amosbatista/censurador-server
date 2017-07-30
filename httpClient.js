@@ -2,14 +2,21 @@ function service(param){
 
 	return new Promise (function(resolve, reject){
 
-		var http = require('http');
+		
 		var URL = require('url');
 
 		param = param || {};
 		param.encoding = param.encoding || 'utf8';
 		param.url = param.url || '';
 
+		if(param.url.search('https://') >= 0)
+			var http = require('https');
+		else
+			var http = require('http');
+
 		var opt = URL.parse(param.url);
+		
+		console.log('URl pesquisa', opt);
 
 		var httpReq = http.request(opt, function(response){
 			response.setEncoding('utf8');

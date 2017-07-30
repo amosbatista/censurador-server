@@ -1,7 +1,7 @@
 {
 	"general": {
 		"port": 3000,
-		"logPath": "log"
+		"logPath": "/log"
 	},
 
 	"api": {
@@ -19,8 +19,14 @@
 	"censorProcessors": {
 		"events": {
 			"processThisSong": "censor.processSong",
+			"findThisSong": "censor.findSong",
 			"showTheResult": "censor.result"
 		},
+		"url":{
+			"searchSong": "/searchSong",
+			"processSong": "/processSong"
+		},
+
 		"process": [
 			{
 				"name":"basic",

@@ -3,6 +3,10 @@ var service = {
 	current: function(){
 		var moment = require('moment');
 		return moment();
+	},
+
+	format: function(momentToFormat, format){
+		return momentToFormat.format(format);
 	}
 };
 

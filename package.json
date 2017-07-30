@@ -15,9 +15,11 @@
   "homepage": "https://bitbucket.org/amos-batista/censurador-server#readme",
   "dependencies": {
     "http": "0.0.0",
+    "https": "^1.0.0",
     "log": "^1.4.0",
     "moment": "^2.18.1",
     "mysql": "^2.13.0",
+    "node-router": "^0.1.5",
     "socket.io": "^2.0.3",
     "uid-generator": "^0.1.1"
   }
