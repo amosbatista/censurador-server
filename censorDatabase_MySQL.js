@@ -4,22 +4,18 @@ var dbService = function(config){
 
 	return {
 		setupDatabase: function(){
-			var connection = mysql.createConnection(config);
+			var connection = mysql.createConnection(config.database);
+			var databaseCommandList = requre('./database_command_creation');
+
 			connection.connect();
 
 			/* Check table creation */
-			var baseCommand = 'CREATE TABLE IF NOT EXISTS censorResultProcess (idCensor VARCHAR(50) NOT NULL, processName VARCHAR(50) NOT NULL, idCensorResult INT NOT NULL);'
+			databaseCommandList.commandlist.forEach(function(commandItem){
 
-			connection.query(baseCommand, function (error, results, fields) {
-				if (error) 
-					throw('Error at check "processo"', error);
-			});
-
-			baseCommand = 'CREATE TABLE IF NOT EXISTS censorResult (idCensor VARCHAR(50) NOT NULL, idApi VARCHAR(50) NOT NULL, songName VARCHAR(100) NOT NULL,censorDate DATETIME NOT NULL);'
-
-			connection.query(baseCommand, function (error, results, fields) {
-				if (error) 
-					throw('Error at check "resultado"', error);
+				connection.query(commandItem.command, function (error, results, fields) {
+					if (error) 
+						throw('Error at daabase check "' + commandItem.name + '"', error);
+				});	
 			});
 
 			connection.end();
@@ -36,7 +32,7 @@ var dbService = function(config){
 
 				try{
 
-					var connection = mysql.createConnection(config);
+					var connection = mysql.createConnection(config.database);
 					connection.connect();
 
 					var command = "SELECT P.processName, P.idCensorResult, R.songName FROM censorResult R INNER JOIN censorResultProcess P ON P.idCensor = R.idCensor  WHERE R.idApi = ?";
@@ -107,12 +103,10 @@ var dbService = function(config){
 					var date = require('./dateSrv');
 					var currentDate = date.current();
 
-					var UIDGenerator = require('uid-generator');
-					var uidgen3 = new UIDGenerator(128, UIDGenerator.BASE62);
+					var idGenerator = require('./idGenerator');
+					idGenerator().then(function(idCensor){
 
-					uidgen3.generate().then(function(idCensor){
-
-						var connection = mysql.createConnection(config);
+						var connection = mysql.createConnection(config.database);
 						connection.connect();
 
 						connection.query(
@@ -143,6 +137,7 @@ var dbService = function(config){
 							);
 						}, '');
 
+						connection.end();
 						resolve();
 
 					}).catch(function(uidError){
@@ -153,6 +148,195 @@ var dbService = function(config){
 					reject(err);
 				}
 			})				
+		},
+
+		searchSongIntoCache: function(q){
+			
+			return new Promise (function(resolve, reject){
+
+				if(!q)
+					reject('Empty parameters in search song from cache;');
+				
+				try{
+
+					var connection = mysql.createConnection(config.database);
+					connection.connect();
+
+					var command = "SELECT TOP " + config.queryLimit " A.artistName, S.songName, S.idAPI, A.idSearch "
+						+ "FROM searchCache_artist S "
+						+ "INNER JOIN searchCache_song S ON A.idSearch = S.idSearch_Artist "
+						+ " WHERE A.artistName LIKE '%?%' OR S.songName LIKE '%?%'"
+
+					connection.query(command, [
+						q, q
+					], function (error, results, fields) {
+
+						connection.end();
+
+						if (error)
+							reject(error);
+						else{
+								
+							if(results.length <= 0)
+								resolve(null);
+							else{
+								resolve(result);
+							}
+						}
+					});
+				}
+				catch(err){
+					reject(err);
+				}
+			})			
+		},
+		searchSongIntoCacheWithArtist: function(q, artistId){
+			
+			return new Promise (function(resolve, reject){
+
+				if(!q)
+					reject('Empty parameters in song search from cache;');
+				if(!artistId)
+					reject('No artist ID in load song from cache;');
+				
+				try{
+
+					var connection = mysql.createConnection(config.database);
+					connection.connect();
+
+					var command = "SELECT TOP " + config.queryLimit " S.songName, S.idAPI "
+						+ "FROM searchCache_artist S "
+						+ "INNER JOIN searchCache_song S ON A.idSearch = S.idSearch_Artist "
+						+ " WHERE S.songName LIKE '%?%' AND S.idSearch_Artist = ?"
+
+					connection.query(command, [
+						q, artistId
+					], function (error, results, fields) {
+
+						connection.end();
+
+						if (error)
+							reject(error);
+						else{
+								
+							if(results.length <= 0)
+								resolve(null);
+							else{
+
+								resolve(result);
+							}
+						}
+					});
+				}
+				catch(err){
+					reject(err);
+				}
+			})			
+		},
+
+		loadOrSaveArtistToCache: function(artistName){
+
+			return new Promise (function(resolve, reject){
+
+				if(!artistName || artistName == '')
+					reject('Artist name is null at saveArtistToCache');
+
+				var connection = mysql.createConnection(config.database);
+				connection.connect();
+
+				var command = "SELECT idSearch "
+					+ "FROM searchCache_artist "
+					+ " WHERE artistName = ?"
+
+				connection.query(command, [
+					artistName
+				], function (error, results, fields) {
+
+					if(error){
+						connection.end();
+						reject('Error at artist search in cache:' + error);
+					}
+					if(results.length <= 0){
+
+						var idGenerator = require('./idGenerator');
+						idGenerator().then(function(newId){
+
+							connection.query(
+								'INSERT INTO searchCache_artist (idSearch, artistName) VALUES(?,?)', 
+								[
+									newId, artistName
+								],
+								function (error, results, fields) {
+									connection.end();
+
+									if(error)
+										reject('Error at artist insertion in cache:' + error);
+
+									resolve(newId);
+								}
+							);
+						});
+					}
+					else{
+						connection.end();
+						resolve(results[0].idSearch);
+					}
+				})
+			});
+		},
+
+		loadOrSaveSongToCache: function(songName, songAPIId, artistId ){
+
+			return new Promise (function(resolve, reject){
+
+				if(!songName || songName == '')
+					reject('Song name is empty at save song to cache');
+				if(!songAPIId || songAPIId == '')
+					reject('Song API ID is empty at save song to cache');
+				if(!artistId || artistId == '')
+					reject('Artist ID is empty at save song to cache');
+
+				var connection = mysql.createConnection(config.database);
+				connection.connect();
+
+				var command = "SELECT 1 "
+					+ "FROM searchCache_song "
+					+ " WHERE idAPI = ?"
+
+				connection.query(command, [
+					songAPIId
+				], function (error, results, fields) {
+
+					if(error){
+						connection.end();
+						reject('Error at artist search in cache:' + error);
+					}
+					if(results.length <= 0){
+
+						var idGenerator = require('./idGenerator');
+						idGenerator().then(function(newId){
+
+							connection.query(
+								'INSERT INTO searchCache_song (idSearch, idSearch_Artist, songName, idAPI) VALUES(?,?,?,?)', 
+								[
+									newId, artistId, songName, songAPIId
+								],
+								function (error, results, fields) {
+									connection.end();
+									if(error)
+										reject('Error at artist insertion in cache:' + error);
+
+									resolve();
+								}
+							);
+						});
+					}
+					else{
+						connection.end();
+						resolve();
+					}
+				})
+			});
 		}
 	};
 };

@@ -1,0 +1,20 @@
+{
+	"commandList": [
+		{
+			"name": "resultProcess",
+			"command": "CREATE TABLE IF NOT EXISTS censorResultProcess (idCensor VARCHAR(50) NOT NULL, processName VARCHAR(50) NOT NULL, idCensorResult INT NOT NULL);"
+		},
+		{
+			"name": "result",
+			"command": "CREATE TABLE IF NOT EXISTS censorResultProcess (idCensor VARCHAR(50) NOT NULL, processName VARCHAR(50) NOT NULL, idCensorResult INT NOT NULL);"
+		},
+		{
+			"name": "cache_Artist",
+			"command": "CREATE TABLE IF NOT EXISTS searchCache_artist (idSearch VARCHAR(50) NOT NULL, artistName VARCHAR(100) NOT NULL);"
+		},
+		{
+			"name": "cache_Song",
+			"command": "CREATE TABLE IF NOT EXISTS searchCache_song (idSearch VARCHAR(50) NOT NULL, idSearch_Artist VARCHAR(50) NOT NULL, songName VARCHAR(100) NOT NULL, idAPI VARCHAR(50) NOT NULL);"
+		}
+	]
+}

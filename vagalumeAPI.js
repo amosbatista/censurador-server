@@ -1,6 +1,32 @@
 var service = function(config){
 	var request = require('./httpClient');
 
+
+	var _APISearchProcess = function(result){
+					
+		var objResult = JSON.parse(result);
+
+		return objResult.response.docs.map(function(song){
+
+			var returnObj = {
+				artistName: song.band,
+				type: ''
+			};
+
+			if(item.title){
+				returnObj.type = 'song';
+				returnObj.songAPIId = item.id;
+				returnObj.songName = item.title;
+
+			}else{ 
+				returnObj.type = 'artist';
+			}
+
+			return returnObj;
+		});
+
+	}
+
 	return {
 		loadSong: function(param){
 			return new Promise(function(resolve, reject){
@@ -11,7 +37,7 @@ var service = function(config){
 
 				request(
 					{
-						url: 'https://api.vagalume.com.br/search.php?apikey=' + config.apiKey + '&musid=' + param.songId
+						url: 'https://api.vagalume.com.br/search.php?apikey=' + config.api.apiKey + '&musid=' + param.songId
 					}
 				).then(function(result){
 
@@ -33,34 +59,42 @@ var service = function(config){
 				})
 			});
 		},
-		searchSong: function(param){
+		searchSongExcerpt: function(q){
 
 			return new Promise(function(resolve, reject){
 
 				var removerAcento = require('./libs/remover-acentos');
 
-				if(!param)
-					reject('No parameters in seach request;');
-				if(!param.songName)
-					reject('Empty song name has been sent in seach request;');
+				if(!q)
+					reject('Nothing in search request;');
 
 				request(
 					{
-						url: 'https://api.vagalume.com.br/search.excerpt?apikey=' + config.apiKey + '&q=' + removerAcento(param.songName.toLowerCase())
+						url: 'https://api.vagalume.com.br/search.excerpt?limit=' + config.queryLimit + '&apikey=' + config.api.apiKey + '&q=' + removerAcento(q.toLowerCase())
 					}
 				).then(function(result){
-					
-					var objResult = JSON.parse(result);
-
-					resolve(objResult.response.docs.map(function(song){
-						return {
-							songId: song.id,
-							name: song.title,
-							artist: song.band
-						}
-					}))
-
+					resolve(_APISearchProcess(result));
 				}).catch(function(err){
+					reject(err);
+				})
+			});
+		},
+		searchSongAndArtist: function(q){
+
+			return new Promise(function(resolve, reject){
+
+				var removerAcento = require('./libs/remover-acentos');
+
+				if(!q)
+					reject('Nothing in search request;');
+
+				request(
+					{
+						url: 'https://api.vagalume.com.br/search.artmus?limit=' + config.queryLimit + '&apikey=' + config.api.apiKey + '&q=' + removerAcento(q.toLowerCase())
+					}
+				).then(function(result){
+					resolve(_APISearchProcess(result));
+				.catch(function(err){
 					reject(err);
 				})
 			});

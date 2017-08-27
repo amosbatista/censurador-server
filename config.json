@@ -1,19 +1,19 @@
 {
 	"general": {
 		"port": 3000,
-		"logPath": "/log"
+		"logPath": "/log",
+		"queryLimit": 5
 	},
 
 	"api": {
-		"configFile": "config/vagalume.json",
-		"apiKey": "670d06d80b6831b48c9de5fb54ff7799"
+		"apiKey": "670d06d80b6831b48c9de5fb54ff7799",
 	},
 
 	"database": {
 		"host": "localhost",
 		"database": "censor",
 		"user": "root",
-		"password": "amos"
+		"password": "amos",
 	},
 
 	"censorProcessors": {

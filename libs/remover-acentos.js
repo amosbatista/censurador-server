@@ -24,7 +24,6 @@ var service = function ( newStringComAcento ) {
 
 	for ( var letra in mapaAcentosHex ) {
 		var expressaoRegular = mapaAcentosHex[letra];
-		console.log('validacao letra', letra + ' - ' + string.search( expressaoRegular, letra ))
 		string = string.replace( expressaoRegular, letra );
 	}
 
