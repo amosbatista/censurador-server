@@ -37,6 +37,9 @@ var service = function(req, res, next){
 
 	/* First: cache */
 	if(req.query.artistId){
+
+		console.log('REQ', req)
+		
 		cache.searchSongIntoCache(req.query.searchValue)
 
 			.then(function(result){
