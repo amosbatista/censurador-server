@@ -3,7 +3,7 @@ var service = function(){
 	var uidgen3 = new UIDGenerator(128, UIDGenerator.BASE62);
 
 	// Return the promise
-	uidgen3.generate();	
+	return uidgen3.generate();	
 }
 
 module.exports = service;

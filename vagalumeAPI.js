@@ -3,20 +3,24 @@ var service = function(config){
 
 
 	var _APISearchProcess = function(result){
+
 					
 		var objResult = JSON.parse(result);
 
+
 		return objResult.response.docs.map(function(song){
+
+			console.log('Song', song);	
 
 			var returnObj = {
 				artistName: song.band,
 				type: ''
 			};
 
-			if(item.title){
+			if(song.title){
 				returnObj.type = 'song';
-				returnObj.songAPIId = item.id;
-				returnObj.songName = item.title;
+				returnObj.songAPIId = song.id;
+				returnObj.songName = song.title;
 
 			}else{ 
 				returnObj.type = 'artist';
@@ -70,7 +74,7 @@ var service = function(config){
 
 				request(
 					{
-						url: 'https://api.vagalume.com.br/search.excerpt?limit=' + config.queryLimit + '&apikey=' + config.api.apiKey + '&q=' + removerAcento(q.toLowerCase())
+						url: 'https://api.vagalume.com.br/search.excerpt?limit=' + config.general.queryLimit + '&apikey=' + config.api.apiKey + '&q=' + removerAcento(q.toLowerCase())
 					}
 				).then(function(result){
 					resolve(_APISearchProcess(result));
@@ -90,11 +94,11 @@ var service = function(config){
 
 				request(
 					{
-						url: 'https://api.vagalume.com.br/search.artmus?limit=' + config.queryLimit + '&apikey=' + config.api.apiKey + '&q=' + removerAcento(q.toLowerCase())
+						url: 'https://api.vagalume.com.br/search.artmus?limit=' + config.general.queryLimit + '&apikey=' + config.api.apiKey + '&q=' + removerAcento(q.toLowerCase())
 					}
 				).then(function(result){
 					resolve(_APISearchProcess(result));
-				.catch(function(err){
+				}).catch(function(err){
 					reject(err);
 				})
 			});

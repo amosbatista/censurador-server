@@ -1,17 +1,22 @@
 var service = function(req, res, next){
-
-	var songAPI = require('./vagalumeAPI')(config);
-	var cache = require('./censorDatabase_MySQL')(config);
-
-	var theResultList = [];
+	//try{
+		var config = require("./config");
+		var log = require('./logSrv')(config.general);
+		var songAPI = require('./vagalumeAPI')(config);
+		var cache = require('./censorDatabase_MySQL')(config);
+		var theResultList = [];
+	/*}
+	catch(err){
+		console.log(err);
+	}*/
 
 	var errorDeal = function(err){
-
-		log.write("Error at song search: " + errorResult);
+		console.log(JSON.stringify(err));
+		log.write("Error at song search: " + JSON.stringify(err));
 		log.write("Error requisition: " + req);
 		res.send({
 			errorMsg: 'Error at song search',
-			errorObj: errorResult
+			errorObj: JSON.stringify(err)
 		});
 	}
 
@@ -35,15 +40,63 @@ var service = function(req, res, next){
 		});
 	};
 
-	/* First: cache */
-	if(req.query.artistId){
+	var _processAfterFirstCache = function(theResultList){
 
-		console.log('REQ', req)
+		if(theResultList.length >= config.queryLimit)
+			_processReturn(theResultList);
+		else{
+
+
+			/* Second: API name */
+			var apiSearchQuery = '';
+
+			if(req.query.artistId)
+				apiSearchQuery = req.query.songName + ' ' + req.query.artistId;
+			else
+				apiSearchQuery = req.query.searchValue;
+
+			songAPI.searchSongAndArtist(apiSearchQuery).then(function(apiResult){
+
+				_processCache(apiResult);
+				theResultList.concat(apiResult);
+
+				if(theResultList.length >= config.queryLimit)
+					_processReturn(theResultList);
+				else{
+
+
+					/* Third: API Song Excerpt*/
+					if(req.query.artistId)
+						apiSearchQuery = req.query.songName;
+					else
+						apiSearchQuery = req.query.searchValue;
+
+					songAPI.searchSongExcerpt(apiSearchQuery).then(function(apiResult){
+						_processCache(apiResult);
+						
+						theResultList.concat(apiResult);
+						_processReturn(theResultList);
+
+					}).catch(function(err){
+						errorDeal(err);
+					})
+				}
+
+			}).catch(function(err){
+				errorDeal(err);
+			})
+		}
+	}
+
+	/* First: cache */
+	if(!req.query.artistId){
 		
 		cache.searchSongIntoCache(req.query.searchValue)
 
 			.then(function(result){
 				theResultList.concat(result);
+
+				_processAfterFirstCache(theResultList);
 			}).catch(function(err){
 				errorDeal(err);
 			})
@@ -51,51 +104,8 @@ var service = function(req, res, next){
 	else{
 		cache.searchSongIntoCacheWithArtist(req.query.songName, req.query.artistId).then(function(result){
 			theResultList.concat(result);
-
-			if(theResultList.length >= config.queryLimit)
-				_processReturn(theResultList);
-			else{
-
-
-				/* Second: API name */
-				var apiSearchQuery = '';
-
-				if(req.query.artistId)
-					apiSearchQuery = req.query.songName + ' ' + req.query.artistId;
-				else
-					apiSearchQuery = req.query.searchValue;
-
-				songAPI.searchSongAndArtist(apiSearchQuery).then(function(apiResult){
-
-					_processCache(apiResult);
-					theResultList.concat(apiResult);
-
-					if(theResultList.length >= config.queryLimit)
-						_processReturn(theResultList);
-					else{
-
-
-						/* Third: API Song Excerpt*/
-						if(req.query.artistId)
-							apiSearchQuery = req.query.songName;
-						else
-							apiSearchQuery = req.query.searchValue;
-
-						songAPI.searchSongExcerpt(apiSearchQuery).then(function(apiResult){
-							_processCache(apiResult);
-							
-							theResultList.concat(apiResult);
-							_processReturn(theResultList);
-
-						}).catch(function(err){
-							errorDeal(err);
-						})
-					}
-
-				}).catch(function(err){
-					errorDeal(err);
-				})
-			}
+			_processAfterFirstCache(theResultList);
+			
 		}).catch(function(err){
 			errorDeal(err);
 		})

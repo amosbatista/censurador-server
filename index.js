@@ -10,7 +10,7 @@ var censorProcessorsFolder = "./censors/";
 var censorProcessorsModules;
 
 
-log = new Log(config.general);
+var log = new Log(config.general);
 
 
 serverSrv({
@@ -31,7 +31,7 @@ serverSrv({
 	atStart: function(server){
 
 		try{
-			var censorDataBaseModule = require("./censorDatabase_MySQL")(config.database);
+			var censorDataBaseModule = require("./censorDatabase_MySQL")(config);
 			censorDataBaseModule.setupDatabase();
 			log.write('Error at database start: ', err);
 		}

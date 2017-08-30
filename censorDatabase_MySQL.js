@@ -5,16 +5,15 @@ var dbService = function(config){
 	return {
 		setupDatabase: function(){
 			var connection = mysql.createConnection(config.database);
-			var databaseCommandList = requre('./database_command_creation');
-
+			var databaseCommandList = require('./database_command_creation');
 			connection.connect();
 
 			/* Check table creation */
-			databaseCommandList.commandlist.forEach(function(commandItem){
+			databaseCommandList.commandList.forEach(function(commandItem){
 
 				connection.query(commandItem.command, function (error, results, fields) {
 					if (error) 
-						throw('Error at daabase check "' + commandItem.name + '"', error);
+						throw('Error at database check "' + commandItem.name + '"', error);
 				});	
 			});
 
@@ -155,22 +154,25 @@ var dbService = function(config){
 			return new Promise (function(resolve, reject){
 
 				if(!q)
-					reject('Empty parameters in search song from cache;');
+					reject('Empty parameters in song search from cache;');
 				
 				try{
 
 					var connection = mysql.createConnection(config.database);
 					connection.connect();
 
-					var command = "SELECT TOP " + config.queryLimit " A.artistName, S.songName, S.idAPI, A.idSearch "
-						+ "FROM searchCache_artist S "
+					var command = "SELECT A.artistName, S.songName, S.idAPI, A.idSearch "
+						+ "FROM searchCache_artist A "
 						+ "INNER JOIN searchCache_song S ON A.idSearch = S.idSearch_Artist "
-						+ " WHERE A.artistName LIKE '%?%' OR S.songName LIKE '%?%'"
+						+ " WHERE A.artistName LIKE ? OR S.songName LIKE ? LIMIT " + config.general.queryLimit + ";"
+
+					console.log(command);
 
 					connection.query(command, [
-						q, q
+						'%' + q + '%', '%' + q + '%'
 					], function (error, results, fields) {
 
+						console.log(error);
 						connection.end();
 
 						if (error)
@@ -195,7 +197,7 @@ var dbService = function(config){
 			return new Promise (function(resolve, reject){
 
 				if(!q)
-					reject('Empty parameters in song search from cache;');
+					reject('Empty parameters in song with artist search from cache;');
 				if(!artistId)
 					reject('No artist ID in load song from cache;');
 				
@@ -204,10 +206,10 @@ var dbService = function(config){
 					var connection = mysql.createConnection(config.database);
 					connection.connect();
 
-					var command = "SELECT TOP " + config.queryLimit " S.songName, S.idAPI "
-						+ "FROM searchCache_artist S "
+					var command = "SELECT S.songName, S.idAPI "
+						+ "FROM searchCache_artist A "
 						+ "INNER JOIN searchCache_song S ON A.idSearch = S.idSearch_Artist "
-						+ " WHERE S.songName LIKE '%?%' AND S.idSearch_Artist = ?"
+						+ " WHERE S.songName LIKE '%?%' AND S.idSearch_Artist = ? LIMIT " + config.general.queryLimit + ";"
 
 					connection.query(command, [
 						q, artistId

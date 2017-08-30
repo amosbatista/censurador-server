@@ -20,7 +20,7 @@ var service = function(param){
 
 
 	route(function(req){
-		console.log('Função de req teste', req);
+		console.log('Função de req teste');
 	}); 
 
 
