@@ -35,6 +35,7 @@ var dbService = function(config){
 					connection.connect();
 
 					var command = "SELECT P.processName, P.idCensorResult, R.songName FROM censorResult R INNER JOIN censorResultProcess P ON P.idCensor = R.idCensor  WHERE R.idApi = ?";
+
 					connection.query(command, [
 						params.songId
 					], function (error, results, fields) {

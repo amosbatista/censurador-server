@@ -6,10 +6,7 @@ var Log = require('./logSrv');
 var processSong = require('./_index_processSong');
 var searchSong = require('./_index_searchSong');
 var deepSearchSong = require('./_index_deepSearchSong');
-
-var censorProcessorsFolder = "./censors/";
-var censorProcessorsModules;
-
+var processSongFromDeepSearch = require('./_index_processSongFromDeep');
 
 var log = new Log(config.general);
 
@@ -31,6 +28,11 @@ serverSrv({
 		{
 			url: config.censorProcessors.url.deepSearchSong,
 			handle: deepSearchSong
+		},
+
+		{
+			url: config.censorProcessors.url.processSongFromDeepSearch,
+			handle: processSongFromDeepSearch
 		}
 	],
 
@@ -44,11 +46,6 @@ serverSrv({
 		catch(err){
 			log.write('Server started at port ' + config.general.port);
 		};
-
-		censorProcessorsModules = config.censorProcessors.process.reduce(function(_finalObject, _processConfig){
-			_finalObject[_processConfig.name] = require(censorProcessorsFolder + _processConfig.module)();
-			return _finalObject;
-		}, {});
 		
 
 		/* Process */

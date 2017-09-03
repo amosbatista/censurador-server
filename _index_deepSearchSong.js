@@ -26,7 +26,6 @@ var service = function(req, res, next){
 
 	var promiseResult = null;
 
-
 	if(req.query.artistName)
 		promiseResult = searchAPI.searchBySongAndArtist(req.query.songExcerpt, req.query.artistName);
 	else

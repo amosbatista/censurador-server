@@ -29,7 +29,8 @@
 		"url":{
 			"searchSong": "/searchSong",
 			"deepSearchSong": "/deepSearchSong",
-			"processSong": "/processSong"
+			"processSong": "/processSong",
+			"processSongFromDeepSearch": "/processFromDeepSearch"
 		},
 
 		"process": [

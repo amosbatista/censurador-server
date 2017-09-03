@@ -5,6 +5,14 @@ var service = function(req, res, next){
 	var censorDataBaseModule = require("./censorDatabase_MySQL")(config.database);
 	var theSong;
 
+	var censorProcessorsFolder = "./censors/";
+	var censorProcessorsModules;
+
+	var censorProcessorsModules = config.censorProcessors.process.reduce(function(_finalObject, _processConfig){
+		_finalObject[_processConfig.name] = require(censorProcessorsFolder + _processConfig.module)();
+		return _finalObject;
+	}, {});
+
 	var resultProcess = function(){
 
 		var censorResult = censorResultList.reduce(function(_censorResult, censor){
@@ -58,7 +66,7 @@ var service = function(req, res, next){
 
 			songAPI.loadSong(songData).then(function(songFromAPI){
 
-				var theSong = songFromAPI;
+				theSong = songFromAPI;
 
 				Object.keys(censorProcessorsModules).forEach(function(_censorProcessorName){
 					var censorResult = censorProcessorsModules[_censorProcessorName].filter(songFromAPI, _censorProcessorName);

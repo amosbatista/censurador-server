@@ -6,7 +6,6 @@ var service = function(req, res, next){
 	var cache = require('./censorDatabase_MySQL')(config);
 	
 	var errorDeal = function(err){
-		console.log(JSON.stringify(err));
 		log.write("Error at song search: " + JSON.stringify(err));
 		log.write("Error requisition: " + req);
 		res.send({
@@ -45,8 +44,8 @@ var service = function(req, res, next){
 			/* Second: API name */
 			var apiSearchQuery = '';
 
-			if(req.query.artistId)
-				apiSearchQuery = req.query.songName + ' ' + req.query.artistId;
+			if(req.query.artistName)
+				apiSearchQuery = req.query.artistName + ' ' + req.query.songName;
 			else
 				apiSearchQuery = req.query.searchValue;
 
