@@ -166,13 +166,10 @@ var dbService = function(config){
 						+ "INNER JOIN searchCache_song S ON A.idSearch = S.idSearch_Artist "
 						+ " WHERE A.artistName LIKE ? OR S.songName LIKE ? LIMIT " + config.general.queryLimit + ";"
 
-					console.log(command);
-
 					connection.query(command, [
 						'%' + q + '%', '%' + q + '%'
 					], function (error, results, fields) {
 
-						console.log(error);
 						connection.end();
 
 						if (error)
@@ -180,9 +177,9 @@ var dbService = function(config){
 						else{
 								
 							if(results.length <= 0)
-								resolve(null);
+								resolve([]);
 							else{
-								resolve(result);
+								resolve(results);
 							}
 						}
 					});
@@ -222,10 +219,10 @@ var dbService = function(config){
 						else{
 								
 							if(results.length <= 0)
-								resolve(null);
+								resolve([]);
 							else{
 
-								resolve(result);
+								resolve(results);
 							}
 						}
 					});
@@ -257,6 +254,7 @@ var dbService = function(config){
 					if(error){
 						connection.end();
 						reject('Error at artist search in cache:' + error);
+						return;
 					}
 					if(results.length <= 0){
 
@@ -273,8 +271,8 @@ var dbService = function(config){
 
 									if(error)
 										reject('Error at artist insertion in cache:' + error);
-
-									resolve(newId);
+									else
+										resolve(newId);
 								}
 							);
 						});
@@ -312,6 +310,7 @@ var dbService = function(config){
 					if(error){
 						connection.end();
 						reject('Error at artist search in cache:' + error);
+						return;
 					}
 					if(results.length <= 0){
 
@@ -327,8 +326,8 @@ var dbService = function(config){
 									connection.end();
 									if(error)
 										reject('Error at artist insertion in cache:' + error);
-
-									resolve();
+									else
+										resolve();
 								}
 							);
 						});

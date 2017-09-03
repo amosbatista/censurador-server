@@ -10,7 +10,7 @@
  * @return {String}                 [string sem acentos]
  */
 var service = function ( newStringComAcento ) {
-	console.log('TExto in', newStringComAcento);
+
   var string = newStringComAcento;
 	var mapaAcentosHex 	= {
 		a : /[\xE0-\xE6]/g,

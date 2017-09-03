@@ -15,8 +15,6 @@ function service(param){
 			var http = require('http');
 
 		var opt = URL.parse(param.url);
-		
-		console.log('URl pesquisa', opt);
 
 		var httpReq = http.request(opt, function(response){
 			response.setEncoding('utf8');

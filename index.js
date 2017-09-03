@@ -5,6 +5,7 @@ var Log = require('./logSrv');
 
 var processSong = require('./_index_processSong');
 var searchSong = require('./_index_searchSong');
+var deepSearchSong = require('./_index_deepSearchSong');
 
 var censorProcessorsFolder = "./censors/";
 var censorProcessorsModules;
@@ -25,6 +26,11 @@ serverSrv({
 		{
 			url: config.censorProcessors.url.processSong,
 			handle: processSong
+		},
+
+		{
+			url: config.censorProcessors.url.deepSearchSong,
+			handle: deepSearchSong
 		}
 	],
 

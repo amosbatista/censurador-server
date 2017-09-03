@@ -3,14 +3,10 @@ var service = function(config){
 
 
 	var _APISearchProcess = function(result){
-
 					
 		var objResult = JSON.parse(result);
 
-
 		return objResult.response.docs.map(function(song){
-
-			console.log('Song', song);	
 
 			var returnObj = {
 				artistName: song.band,
@@ -37,7 +33,7 @@ var service = function(config){
 				if(!param)
 					reject('No parameters in load song request;');
 				if(!param.songId)
-					reject('Empty song ID has been sent in seach request;');
+					reject('Empty song ID has been sent in search request;');
 
 				request(
 					{
@@ -71,6 +67,7 @@ var service = function(config){
 
 				if(!q)
 					reject('Nothing in search request;');
+				console.log('URL pesquisa', 'https://api.vagalume.com.br/search.excerpt?limit=' + config.general.queryLimit + '&apikey=' + config.api.apiKey + '&q=' + removerAcento(q.toLowerCase()))
 
 				request(
 					{
@@ -92,6 +89,7 @@ var service = function(config){
 				if(!q)
 					reject('Nothing in search request;');
 
+				console.log('URL pesquisa', 'https://api.vagalume.com.br/search.artmus?limit=' + config.general.queryLimit + '&apikey=' + config.api.apiKey + '&q=' + removerAcento(q.toLowerCase()))
 				request(
 					{
 						url: 'https://api.vagalume.com.br/search.artmus?limit=' + config.general.queryLimit + '&apikey=' + config.api.apiKey + '&q=' + removerAcento(q.toLowerCase())

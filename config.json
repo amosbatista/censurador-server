@@ -6,7 +6,11 @@
 	},
 
 	"api": {
-		"apiKey": "670d06d80b6831b48c9de5fb54ff7799"
+		"apiKey": "670d06d80b6831b48c9de5fb54ff7799",
+		"google": {
+			"key": "AIzaSyAuKApLJM3q9dtc2GIn_Jbz2zrBtkHOndo",
+  			"cx": "016537176466228436313:hqd9bfoj6gg"
+		}
 	},
 
 	"database": {
@@ -24,6 +28,7 @@
 		},
 		"url":{
 			"searchSong": "/searchSong",
+			"deepSearchSong": "/deepSearchSong",
 			"processSong": "/processSong"
 		},
 
