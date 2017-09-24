@@ -36,7 +36,7 @@ serverSrv({
 		}
 	],
 
-	atStart: function(server){
+	atStart: function(){
 
 		try{
 			var censorDataBaseModule = require("./censorDatabase_MySQL")(config);

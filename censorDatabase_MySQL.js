@@ -150,6 +150,46 @@ var dbService = function(config){
 			})				
 		},
 
+		searchArtistIntoCache: function(q){
+			
+			return new Promise (function(resolve, reject){
+
+				if(!q)
+					reject('Empty parameters in artist search from cache;');
+				
+				try{
+
+					var connection = mysql.createConnection(config.database);
+					connection.connect();
+
+					var command = "SELECT artistName, idSearch, 'artist' AS type "
+						+ "FROM searchCache_artist "
+						+ " WHERE artistName LIKE ? LIMIT " + config.general.queryLimit + ";"
+
+					connection.query(command, [
+						'%' + q + '%'
+					], function (error, results, fields) {
+
+						connection.end();
+
+						if (error)
+							reject(error);
+						else{
+								
+							if(results.length <= 0)
+								resolve([]);
+							else{
+								resolve(results);
+							}
+						}
+					});
+				}
+				catch(err){
+					reject(err);
+				}
+			})			
+		},
+
 		searchSongIntoCache: function(q){
 			
 			return new Promise (function(resolve, reject){
@@ -162,13 +202,13 @@ var dbService = function(config){
 					var connection = mysql.createConnection(config.database);
 					connection.connect();
 
-					var command = "SELECT A.artistName, S.songName, S.idAPI, A.idSearch "
+					var command = "SELECT A.artistName, S.songName, S.idAPI, A.idSearch, 'song' as type "
 						+ "FROM searchCache_artist A "
 						+ "INNER JOIN searchCache_song S ON A.idSearch = S.idSearch_Artist "
-						+ " WHERE A.artistName LIKE ? OR S.songName LIKE ? LIMIT " + config.general.queryLimit + ";"
+						+ " WHERE S.songName LIKE ? LIMIT " + config.general.queryLimit + ";"
 
 					connection.query(command, [
-						'%' + q + '%', '%' + q + '%'
+						'%' + q + '%'
 					], function (error, results, fields) {
 
 						connection.end();
@@ -180,6 +220,11 @@ var dbService = function(config){
 							if(results.length <= 0)
 								resolve([]);
 							else{
+								/*results = results.map(function(result){
+									result.type = 'song';
+									return result;
+								});*/
+
 								resolve(results);
 							}
 						}
@@ -204,7 +249,7 @@ var dbService = function(config){
 					var connection = mysql.createConnection(config.database);
 					connection.connect();
 
-					var command = "SELECT S.songName, S.idAPI "
+					var command = "SELECT S.songName, S.idAPI, 'song' as type "
 						+ "FROM searchCache_artist A "
 						+ "INNER JOIN searchCache_song S ON A.idSearch = S.idSearch_Artist "
 						+ " WHERE S.songName LIKE '%?%' AND S.idSearch_Artist = ? LIMIT " + config.general.queryLimit + ";"
@@ -222,6 +267,11 @@ var dbService = function(config){
 							if(results.length <= 0)
 								resolve([]);
 							else{
+
+								/*results = results.map(function(result){
+									result.type = 'song';
+									return result;
+								});*/
 
 								resolve(results);
 							}

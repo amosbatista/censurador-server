@@ -8,26 +8,40 @@
 */
 var service = function(param){
 
-	var http = require('http');
-	var Router = require('node-router');
-	var router = Router();    // create a new Router instance 
-	var route = router.push;  // shortcut for router.push()
+	const http = require('http');
+	const express = require('express')
+	const app = express();
+	
 
-	param.routeList.forEach(function (routeSet){
-		routeSet.method = routeSet.method || 'GET';
-		route(routeSet.method, routeSet.url, routeSet.handle)
+	/*route(function(req, res, next){
+		try{
+			res.header('Access-Control-Allow-Origin', '*');
+		}
+		catch(err){
+			console.log('Erro in header', err);
+		}
+		finally{
+
+			next();
+		}
+	}); */
+
+	app.use(function (req, res, next) {
+		console.log('Making the set')
+		res.setHeader('Access-Control-Allow-Origin', '*');
+		next();
 	});
 
+	param.routeList.forEach(function (routeSet){
+		routeSet.method = routeSet.method || 'get';
+		app[routeSet.method.toLowerCase()](routeSet.url, routeSet.handle);
+	});
 
-	route(function(req){
-		/*console.log('Função de req teste');*/
-	}); 
-
-
-	var _httpServer = http.createServer(router);
+	//var _httpServer = http.createServer(router);
 
 	// Start server
-	_httpServer.listen(param.port, param.atStart(_httpServer));
+	//_httpServer.listen(param.port, param.atStart(_httpServer));
+	app.listen(param.port, param.atStart());
 };
 
 
