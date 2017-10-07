@@ -42,8 +42,9 @@ var service = function(req, res, next){
 	var theResultList = [];
 
 	/* First: sound from cache */
-	if(req.query.artistId)
-		searchSongFromCache = cache.searchSongIntoCacheWithArtist(req.query.songName, req.query.artistId);
+	console.log('Query', JSON.stringify(req.query));
+	if(req.query.artistName)
+		searchSongFromCache = cache.searchSongIntoCacheWithArtistName(req.query.songName, req.query.artistName);
 	else
 		searchSongFromCache = cache.searchSongIntoCache(req.query.searchValue);
 
@@ -56,56 +57,102 @@ var service = function(req, res, next){
 			_processReturn(theResultList);
 		else{
 
-			/* Second: artist from cache*/
-			cache.searchArtistIntoCache(req.query.searchValue).then(function(artistResult){
+			if(req.query.artistName){
+				
+				/* Third: API name */
+				var apiSearchQuery = '';
 
-				theResultList = theResultList.concat(artistResult);
+				if(req.query.artistName)
+					apiSearchQuery = req.query.artistName + ' ' + req.query.songName;
+				else
+					apiSearchQuery = req.query.searchValue;
 
-				if(theResultList.length >= config.general.queryLimit)
+				songAPI.searchSongAndArtist(apiSearchQuery).then(function(apiResult){
+
+					console.log("Resultados da API - Nome da música", apiResult)
+					_processCache(apiResult);
+
+					/* Result check. This entry can bring other result than the exact name*/
+					apiResult = apiResult.reduce (function(finalList, apiItem){
+						var apiItemName = apiItem.songName || apiItem.artistName;
+
+						if(
+							apiItemName.search(req.query.searchValue) >= 0 ||
+							(
+								apiItem.artistName.search(req.query.artistName) >= 0 && 
+								apiItem.songName.search(req.query.songName) >= 0
+							)
+						){
+							finalList.push(apiItem);
+						}
+
+						console.log('API search: ' + apiItemName + ' -find: ' + apiItemName.search(apiSearchQuery))
+
+						return finalList;
+					}, []);
+
+					if(apiResult.length > 0 )
+						theResultList = theResultList.concat(apiResult);
+
 					_processReturn(theResultList);
-				else{				
 
-					/* Third: API name */
-					var apiSearchQuery = '';
+				}).catch(function(err){
+					errorDeal(err);
+				});
 
-					if(req.query.artistName)
-						apiSearchQuery = req.query.artistName + ' ' + req.query.songName;
-					else
-						apiSearchQuery = req.query.searchValue;
+			}
+			else{
 
-					songAPI.searchSongAndArtist(apiSearchQuery).then(function(apiResult){
+				/* Second: artist from cache*/			
+				cache.searchArtistIntoCache(req.query.searchValue).then(function(artistResult){
 
-						console.log("Resultados da API - Nome da música", apiResult)
-						_processCache(apiResult);
+					theResultList = theResultList.concat(artistResult);
 
-						/* Result check. This entry can bring other result than the exact name*/
-						apiResult = apiResult.reduce (function(finalList, apiItem){
-							var apiItemName = apiItem.songName || apiItem.artistName;
-
-							if(
-								apiItemName.search(apiSearchQuery) >= 0
-							){
-								finalList.push(apiItem);
-							}
-
-							console.log('API search: ' + apiItemName + ' -find: ' + apiItemName.search(apiSearchQuery))
-
-							return finalList;
-						}, []);
-
-						if(apiResult.length > 0 )
-							theResultList = theResultList.concat(apiResult);
-
+					if(theResultList.length >= config.general.queryLimit)
 						_processReturn(theResultList);
+					else{				
 
-					}).catch(function(err){
-						errorDeal(err);
-					})
-				}
-			}).catch(function(err){
-				errorDeal(err);
-			});
+						/* Third: API name */
+						var apiSearchQuery = '';
 
+						if(req.query.artistName)
+							apiSearchQuery = req.query.artistName + ' ' + req.query.songName;
+						else
+							apiSearchQuery = req.query.searchValue;
+
+						songAPI.searchSongAndArtist(apiSearchQuery).then(function(apiResult){
+
+							console.log("Resultados da API - Nome da música", apiResult)
+							_processCache(apiResult);
+
+							/* Result check. This entry can bring other result than the exact name*/
+							apiResult = apiResult.reduce (function(finalList, apiItem){
+								var apiItemName = apiItem.songName || apiItem.artistName;
+
+								if(
+									apiItemName.search(apiSearchQuery) >= 0
+								){
+									finalList.push(apiItem);
+								}
+
+								console.log('API search: ' + apiItemName + ' -find: ' + apiItemName.search(apiSearchQuery))
+
+								return finalList;
+							}, []);
+
+							if(apiResult.length > 0 )
+								theResultList = theResultList.concat(apiResult);
+
+							_processReturn(theResultList);
+
+						}).catch(function(err){
+							errorDeal(err);
+						})
+					}
+				}).catch(function(err){
+					errorDeal(err);
+				});
+			}
 		}
 
 	}).catch(function(err){

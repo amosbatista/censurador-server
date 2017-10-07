@@ -252,10 +252,11 @@ var dbService = function(config){
 					var command = "SELECT S.songName, S.idAPI, 'song' as type "
 						+ "FROM searchCache_artist A "
 						+ "INNER JOIN searchCache_song S ON A.idSearch = S.idSearch_Artist "
-						+ " WHERE S.songName LIKE '%?%' AND S.idSearch_Artist = ? LIMIT " + config.general.queryLimit + ";"
+						+ " WHERE S.songName LIKE ? AND S.idSearch_Artist = ? LIMIT " + config.general.queryLimit + ";"
 
 					connection.query(command, [
-						q, artistId
+						'%' + q + '%',
+						artistId
 					], function (error, results, fields) {
 
 						connection.end();
@@ -273,6 +274,50 @@ var dbService = function(config){
 									return result;
 								});*/
 
+								resolve(results);
+							}
+						}
+					});
+				}
+				catch(err){
+					reject(err);
+				}
+			})			
+		},
+
+		searchSongIntoCacheWithArtistName: function(q, artistName){
+			
+			return new Promise (function(resolve, reject){
+
+				if(!q)
+					reject('Empty parameters in song with artist search from cache;');
+				if(!artistName)
+					reject('No artist name in load song from cache;');
+				
+				try{
+
+					var connection = mysql.createConnection(config.database);
+					connection.connect();
+
+					var command = "SELECT S.songName, S.idAPI, 'song' as type "
+						+ "FROM searchCache_artist A "
+						+ "INNER JOIN searchCache_song S ON A.idSearch = S.idSearch_Artist "
+						+ " WHERE S.songName LIKE ? AND A.artistName = ? LIMIT " + config.general.queryLimit + ";"
+
+					connection.query(command, [
+						'%' + q + '%',
+						artistName
+					], function (error, results, fields) {
+
+						connection.end();
+
+						if (error)
+							reject(error);
+						else{
+								
+							if(results.length <= 0)
+								resolve([]);
+							else{
 								resolve(results);
 							}
 						}
