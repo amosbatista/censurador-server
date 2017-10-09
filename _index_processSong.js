@@ -1,8 +1,12 @@
 var service = function(req, res, next){
 
+	var config = require("./config");
+	var log = require('./logSrv')(config.general);
+	var songAPI = require('./vagalumeAPI')(config);
+	var censorDataBaseModule = require("./censorDatabase_MySQL")(config);
+
 	var songData = req.query;
 	var censorResultList = [];
-	var censorDataBaseModule = require("./censorDatabase_MySQL")(config.database);
 	var theSong;
 
 	var censorProcessorsFolder = "./censors/";
@@ -62,8 +66,6 @@ var service = function(req, res, next){
 		}
 		else{
 
-			var songAPI = require('./vagalumeAPI')(config.api);
-
 			songAPI.loadSong(songData).then(function(songFromAPI){
 
 				theSong = songFromAPI;
@@ -71,7 +73,6 @@ var service = function(req, res, next){
 				Object.keys(censorProcessorsModules).forEach(function(_censorProcessorName){
 					var censorResult = censorProcessorsModules[_censorProcessorName].filter(songFromAPI, _censorProcessorName);
 					censorResult.processName = _censorProcessorName;
-
 					censorResultList.push(censorResult);
 				});
 

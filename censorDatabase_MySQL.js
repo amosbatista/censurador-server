@@ -34,7 +34,7 @@ var dbService = function(config){
 					var connection = mysql.createConnection(config.database);
 					connection.connect();
 
-					var command = "SELECT P.processName, P.idCensorResult, R.songName FROM censorResult R INNER JOIN censorResultProcess P ON P.idCensor = R.idCensor  WHERE R.idApi = ?";
+					var command = "SELECT P.processName, P.idCensorResult, R.songName, R.artistName FROM censorResult R INNER JOIN censorResultProcess P ON P.idCensor = R.idCensor  WHERE R.idApi = ?";
 
 					connection.query(command, [
 						params.songId
@@ -93,7 +93,7 @@ var dbService = function(config){
 					
 					if(censor.processName == '')
 						reject('The censor result ' + censorIndex + ' has no name process;');
-					if(!censor.idCensorResult)
+					if(censor.idCensorResult == null || censor.idCensorResult == undefined)
 						reject('The censor result ' + censorIndex + ' has no result ID;');
 					if(typeof censor.idCensorResult != 'number')
 						reject('The censor result ID from ' + censorIndex + ' is not a number;');
@@ -110,11 +110,12 @@ var dbService = function(config){
 						connection.connect();
 
 						connection.query(
-							'INSERT INTO censorResult(idCensor, idApi, songName, censorDate) VALUES (?, ?, ?, ?)', 
+							'INSERT INTO censorResult(idCensor, idApi, songName, artistName, censorDate) VALUES (?, ?, ?, ?)', 
 							[
 								idCensor,
 								params.songId,
-								params.songName,		
+								params.songName,
+								params.artistName,
 								date.format(currentDate, 'YYYY-MM-DD HH:mm:ss')
 							], function (error, results, fields) {
 								if(error)

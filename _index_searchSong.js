@@ -28,7 +28,7 @@ var service = function(req, res, next){
 			cache.loadOrSaveArtistToCache(resultItem.artistName).then(function(artistId){
 
 				if(resultItem.type == 'song')
-					cache.loadOrSaveSongToCache(resultItem.songName, resultItem.songAPIId, artistId)
+					cache.loadOrSaveSongToCache(resultItem.songName, resultItem.idAPI, artistId)
 
 			}).catch(function(err){
 				errorDeal(err);

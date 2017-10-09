@@ -15,7 +15,7 @@ var service = function(config){
 
 			if(song.title){
 				returnObj.type = 'song';
-				returnObj.songAPIId = song.id;
+				returnObj.idAPI = song.id;
 				returnObj.songId = song.id;
 				returnObj.songName = song.title;
 
@@ -46,13 +46,16 @@ var service = function(config){
 
 					if(objResult.type != 'exact')
 						reject('Song has been loaded with status ' + objResult.type);
-
-					resolve({
-						songName: objResult.mus[0].name,
-						songId: objResult.mus[0].id,
-						lirics: objResult.mus[0].text,
-						idiomID: objResult.mus[0].lang
-					})
+					else{
+						resolve({
+							artistName: objResult.art.name,
+							songName: objResult.mus[0].name,
+							songId: objResult.mus[0].id,
+							lirics: objResult.mus[0].text,
+							idiomID: objResult.mus[0].lang
+						})
+						
+					}
 					
 
 				}).catch(function(err){
