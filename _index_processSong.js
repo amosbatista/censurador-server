@@ -37,7 +37,7 @@ var service = function(req, res, next){
 			//otherFeedBack: {}
 		});
 
-		if(censorResult.totalVowsToCensor > 0)
+		if(censorResult.totalVowsToCensor <= 0)
 			censorResult.isSongFreeOfObjections = true;
 		else
 			censorResult.isSongFreeOfObjections = false;
@@ -49,7 +49,10 @@ var service = function(req, res, next){
 
 		censorResult.theSong = theSong;
 
-		res.send (JSON.stringify(censorResult));
+		//setTimeout(function() {
+			res.send (JSON.stringify(censorResult));
+		//}, 5000);
+		
 		//io.emit(config.censorProcessors.events.showTheResult, censorResult);
 	};
 

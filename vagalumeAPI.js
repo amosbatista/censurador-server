@@ -91,7 +91,6 @@ var service = function(config){
 
 				if(!q)
 					reject('Nothing in search request;');
-
 				request(
 					{
 						url: 'https://api.vagalume.com.br/search.artmus?limit=' + config.general.queryLimit + '&apikey=' + config.api.apiKey + '&q=' + removerAcento(q.toLowerCase())

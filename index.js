@@ -4,7 +4,7 @@ var serverSrv = require('./routeServer');
 var Log = require('./logSrv');
 
 var processSong = require('./_index_processSong');
-var searchSong = require('./_index_searchSong');
+var searchSong = require('./_index_searchSong_withoutCache');
 var deepSearchSong = require('./_index_deepSearchSong');
 var processSongFromDeepSearch = require('./_index_processSongFromDeep');
 

@@ -27,7 +27,6 @@ var service = function(param){
 	}); */
 
 	app.use(function (req, res, next) {
-		console.log('Making the set')
 		res.setHeader('Access-Control-Allow-Origin', '*');
 		next();
 	});
