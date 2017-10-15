@@ -6,7 +6,7 @@
 		},
 		{
 			"name": "result",
-			"command": "CREATE TABLE IF NOT EXISTS censorResult (idCensor VARCHAR(50) NOT NULL, idApi VARCHAR(50) NOT NULL, songName VARCHAR(50) NOT NULL, artistName VARCHAR(50) NOT NULL, censorDate DATETIME not null);"
+			"command": "CREATE TABLE IF NOT EXISTS censorResult (idCensor VARCHAR(50) NOT NULL, idApi VARCHAR(50) NOT NULL, songName VARCHAR(50) NOT NULL, artistName VARCHAR(50) NOT NULL, censorDate DATETIME not null, url VARCHAR(255) NOT NULL);"
 		},
 		{
 			"name": "cache_Artist",

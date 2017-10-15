@@ -5,6 +5,7 @@ var service = function(req, res, next){
 	var songAPI = require('./vagalumeAPI')(config);
 	var censorDataBaseModule = require("./censorDatabase_MySQL")(config);
 
+	console.log('query', req.query);
 	var songData = req.query;
 	var censorResultList = [];
 	var theSong;
@@ -12,17 +13,21 @@ var service = function(req, res, next){
 	var censorProcessorsFolder = "./censors/";
 	var censorProcessorsModules;
 
-	var censorProcessorsModules = config.censorProcessors.process.reduce(function(_finalObject, _processConfig){
-		_finalObject[_processConfig.name] = require(censorProcessorsFolder + _processConfig.module)();
-		return _finalObject;
-	}, {});
+	var censorProcessorsModules = config.censorProcessors.process.reduce(function(_list, name){
+
+		_list.push({
+			name: name,
+			module: require(censorProcessorsFolder + name)()
+		});
+		return _list;
+	}, []);
 
 	var resultProcess = function(){
 
 		var censorResult = censorResultList.reduce(function(_censorResult, censor){
 
 			if(censor.vowToCensor == true)
-				_censorResult.totalVowsToCensor = _censorResult.totalVowsToCensor ++;
+				_censorResult.totalVowsToCensor++;
 
 			_censorResult.feedBack.push(censor.feedBack);
 
@@ -61,9 +66,21 @@ var service = function(req, res, next){
 		if(songFromDatabase != null){
 			theSong = songFromDatabase.theSong;
 
+			console.log('The result loaded from database', songFromDatabase.loadedCensorResult);
+
 			songFromDatabase.loadedCensorResult.forEach(function(_censorResult){
-				censorResultList.push(censorResultToPush.processName);
+				var moduleToProcess = censorProcessorsModules.find(function(_censor){
+					return _censor.name == _censorResult.processName;
+				});
+
+				if(moduleToProcess){
+					var censorResult = moduleToProcess.module.loadFromResult(_censorResult.resultId);
+					censorResultList.push(censorResult);
+				}
+				//censorResultList.push(censorProcessorsModules[_censorResult.processName].loadFromResult(_censorResult.idCensorResult));
 			});
+
+			console.log('The result processed from database', censorResultList);
 
 			resultProcess();
 		}
@@ -73,11 +90,19 @@ var service = function(req, res, next){
 
 				theSong = songFromAPI;
 
-				Object.keys(censorProcessorsModules).forEach(function(_censorProcessorName){
-					var censorResult = censorProcessorsModules[_censorProcessorName].filter(songFromAPI, _censorProcessorName);
-					censorResult.processName = _censorProcessorName;
-					censorResultList.push(censorResult);
+				console.log('The modules', censorProcessorsModules);
+
+				censorProcessorsModules.forEach(function(_censor){
+					var censorResult = _censor.module.filter(songFromAPI);
+
+					censorResult.forEach(function(_censorResult){
+						_censorResult.processName = _censor.name;
+					});
+
+					censorResultList = censorResultList.concat(censorResult);
 				});
+
+				console.log('The result', censorResultList);
 
 				songFromAPI.censorResultList = censorResultList;
 

@@ -34,9 +34,103 @@
 		},
 
 		"process": [
+			"7PalavrasProibidas",
+			"apologiaCrime",
+			"comunismo",
+			"dancasIlicitas",
+			"drogasIlicitas",
+			"drogasLicitas",
+			"homosexualismo",
+			"imoralidadeSexual",
+			"irracionalidades",
+			"jargoesPopulares",
+			"pacifismo",
+			"palavrao",
+			"pessimismo",
+			"praticasDitadura",
+			"problemasSociais",
+			"rebeliaoEAnarquia",
+			"regimesBanidos",
+			"religioesDegeneradas",
+			"ritmosDegenerados"
+		],
+
+		"process__": [
 			{
-				"name":"basic",
-				"module": "basic"
+				"name": "7PalavrasProibidas",
+				"module": "7PalavrasProibidas"
+			},
+			{
+				"name": "apologiaCrime",
+				"module": "apologiaCrime"
+			},
+			{
+				"name": "comunismo",
+				"module": "comunismo"
+			},
+			{
+				"name": "dancasIlicitas",
+				"module": "dancasIlicitas"
+			},
+			{
+				"name": "drogasIlicitas",
+				"module": "drogasIlicitas"
+			},
+			{
+				"name": "drogasLicitas",
+				"module": "drogasLicitas"
+			},
+			{
+				"name": "homosexualismo",
+				"module": "homosexualismo"
+			},
+			{
+				"name": "imoralidadeSexual",
+				"module": "imoralidadeSexual"
+			},
+			{
+				"name": "irracionalidades",
+				"module": "irracionalidades"
+			},
+			{
+				"name": "jargoesPopulares",
+				"module": "jargoesPopulares"
+			},
+			{
+				"name": "pacifismo",
+				"module": "pacifismo"
+			},
+			{
+				"name": "palavrao",
+				"module": "palavrao"
+			},
+			{
+				"name": "pessimismo",
+				"module": "pessimismo"
+			},
+			{
+				"name": "praticasDitadura",
+				"module": "praticasDitadura"
+			},
+			{
+				"name": "problemasSociais",
+				"module": "problemasSociais"
+			},
+			{
+				"name": "rebeliaoEAnarquia",
+				"module": "rebeliaoEAnarquia"
+			},
+			{
+				"name": "regimesBanidos",
+				"module": "regimesBanidos"
+			},
+			{
+				"name": "religioesDegeneradas",
+				"module": "religioesDegeneradas"
+			},
+			{
+				"name": "ritmosDegenerados",
+				"module": "ritmosDegenerados"
 			}
 		]
 	}

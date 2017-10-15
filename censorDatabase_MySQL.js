@@ -31,10 +31,12 @@ var dbService = function(config){
 
 				try{
 
+					console.log('params.songId', params.songId);
+
 					var connection = mysql.createConnection(config.database);
 					connection.connect();
 
-					var command = "SELECT P.processName, P.idCensorResult, R.songName, R.artistName FROM censorResult R INNER JOIN censorResultProcess P ON P.idCensor = R.idCensor  WHERE R.idApi = ?";
+					var command = "SELECT P.processName, P.idCensorResult, R.songName, R.artistName, R.url FROM censorResult R INNER JOIN censorResultProcess P ON P.idCensor = R.idCensor  WHERE R.idApi = ?";
 
 					connection.query(command, [
 						params.songId
@@ -55,7 +57,12 @@ var dbService = function(config){
 										resultId: result.idCensorResult
 									});
 
-									final.theSong.name = final.theSong.name || result.songName
+									final.theSong.artistName = result.artistName;
+									final.theSong.songName = result.songName;
+									final.theSong.songId = params.songId;
+									final.theSong.lirics = null;
+									final.theSong.idiomID = null;
+									final.theSong.url = result.url;
 
 									return final;
 								}, {
@@ -104,42 +111,47 @@ var dbService = function(config){
 					var currentDate = date.current();
 
 					var idGenerator = require('./idGenerator');
+
 					idGenerator().then(function(idCensor){
 
 						var connection = mysql.createConnection(config.database);
 						connection.connect();
-
 						connection.query(
-							'INSERT INTO censorResult(idCensor, idApi, songName, artistName, censorDate) VALUES (?, ?, ?, ?)', 
+							'INSERT INTO censorResult(idCensor, idApi, songName, artistName, censorDate, url) VALUES (?, ?, ?, ?, ?, ?)', 
 							[
 								idCensor,
 								params.songId,
 								params.songName,
 								params.artistName,
-								date.format(currentDate, 'YYYY-MM-DD HH:mm:ss')
+								date.format(currentDate, 'YYYY-MM-DD HH:mm:ss'),
+								params.url
 							], function (error, results, fields) {
+
 								if(error)
 									reject(error);
+								else{
+
+									params.censorResultList.forEach(function(censorResult){
+										connection.query(
+											'INSERT INTO censorResultProcess (idCensor, processName, idCensorResult) VALUES (?, ?, ?)',
+											[
+												idCensor,
+												censorResult.processName,
+												censorResult.idCensorResult
+											]
+											, function (error, results, fields) {
+												if(error)
+													reject(error);
+											}
+										);
+									}, '');
+
+									connection.end();
+									resolve();
+
+								}
 							}
 						);
-
-						params.censorResultList.forEach(function(censorResult){
-							connection.query(
-								'INSERT INTO censorResultProcess (idCensor, processName, idCensorResult) VALUES (?, ?, ?)',
-								[
-									idCensor,
-									censorResult.processName,
-									censorResult.idCensorResult
-								]
-								, function (error, results, fields) {
-									if(error)
-										reject(error);
-								}
-							);
-						}, '');
-
-						connection.end();
-						resolve();
 
 					}).catch(function(uidError){
 						reject(uidError);	

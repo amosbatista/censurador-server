@@ -50,9 +50,10 @@ var service = function(config){
 						resolve({
 							artistName: objResult.art.name,
 							songName: objResult.mus[0].name,
-							songId: objResult.mus[0].id,
+							songId: param.songId, 	//objResult.mus[0].id, // o ID trazido para este campo é diferente da API.
 							lirics: objResult.mus[0].text,
-							idiomID: objResult.mus[0].lang
+							idiomID: objResult.mus[0].lang,
+							url: objResult.mus[0].url
 						})
 						
 					}
