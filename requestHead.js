@@ -1,5 +1,5 @@
 var service = function(res){
-	console.log('Res', res);
+	
 	res.writeHead(200, {
 		'Access-Control-Allow-Origin': '*'
 	});

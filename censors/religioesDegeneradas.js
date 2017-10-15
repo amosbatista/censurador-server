@@ -3,6 +3,7 @@ module.exports = service;
 
 var service = function(){
 	
+	const config = require("../config");
 	const censorStatus = [
 		{
 			idCensorResult: 0,
@@ -15,7 +16,7 @@ var service = function(){
 			idCensorResult: 1,
 			feedBack: 'Religiões esotéricas, nova era, práticas contrárias ao cristianismo.',
 			vowToCensor: true,
-			searchTerm: /(energ(ia|y)|zen|medita(c|ç|t)|d?o infinito|infinity|buda|buddha)/i
+			searchTerm: /(energ(ia|y)|zen|medita(c|ç|t)|d?o infinito|infinity|bud(ais)|buddha)/i
 		},
 
 		{
@@ -50,20 +51,20 @@ var service = function(){
 			idCensorResult: 6,
 			feedBack: 'Crenças e folclore indígenas, contrárias a fé vigente no país.',
 			vowToCensor: true,
-			searchTerm: /((í|i)ndi(o|a|gen)|tupã|caipora|curupira|boitat|saci|guarani|tupi)/i
+			searchTerm: /((í|i)ndi(o|a|gen)|tupã|caipora|curupira|boitat|saci|guarani| tupi |bumba( |-)meu boi|boi-bumb)/i
 		},
 
 		{
 			idCensorResult: 7,
 			feedBack: 'Paganismo e bruxaria originarias da europa e de outras regiões.',
 			vowToCensor: true,
-			searchTerm: /(dru(i|í)d|gaia|celt|pag(ã|an)|pagão|mãe terra|mother earth|babil(o|ô)n|maldi(t|ç)|brux(a|o)|fada|feiti(c|ç)|mag(i|a|o))/i
+			searchTerm: /( dru(i|í)d| gaia | celt(a|i)| pag(ã|an) | pagão | mãe terra | mother earth |babil(o|ô)n| maldi(t|ç)| brux(a|o)| fadas? |feiti(c|ç)| mag(i|a|o))/i
 		},
 		{
 			idCensorResult: 7,
 			feedBack: 'Paganismo e bruxaria originarias da europa e de outras regiões.',
 			vowToCensor: true,
-			searchTerm: /(fairy|curse|witch|wizard|mage|magic)/i
+			searchTerm: /( fair(y|e)| curse| witch| wizard| mages? |magic)/i
 		},
 		{
 			idCensorResult: 8,
@@ -75,7 +76,7 @@ var service = function(){
 			idCensorResult: 8,
 			feedBack: 'Astrologia e outros tipos de superstições.',
 			vowToCensor: true,
-			searchTerm: /(planet|star|sign|constelat|fortune)/i
+			searchTerm: /( planets | stars |constelat|fortune)/i
 		},
 		{
 			idCensorResult: 9,
@@ -87,7 +88,7 @@ var service = function(){
 			idCensorResult: 9,
 			feedBack: 'Necromancia, assombrações e assuntos relacionados ao pós-morte, condenados pela igreja e pela sociedade.',
 			vowToCensor: true,
-			searchTerm: /(ghost|zombie|skull|skeleton|werewol|spirit)/i
+			searchTerm: /(ghost|zombie|skull|skeleton|werewol|spirits)/i
 		},
 		{
 			idCensorResult: 10,
@@ -105,10 +106,19 @@ var service = function(){
 		},
 		filter: function(song){
 
-			return censorStatus.filter(function(censor){
-				console.log('Letra religião', song.lirics);
-				return song.lirics.search(censor.searchTerm) > 0;
-			});
+			var censorResult = censorStatus.reduce(function(finalList, censor){
+				var excerptPosition = song.lirics.search(censor.searchTerm);
+
+				if(excerptPosition > 0){
+					censor.censorExcerpt = song.lirics.slice(excerptPosition - config.general.resultExcertpSize, excerptPosition + config.general.resultExcertpSize);
+					finalList.push(censor);
+				}
+
+				return finalList;
+
+			}, []);
+
+			return censorResult;
 		}
 	}
 }

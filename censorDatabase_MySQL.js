@@ -31,12 +31,10 @@ var dbService = function(config){
 
 				try{
 
-					console.log('params.songId', params.songId);
-
 					var connection = mysql.createConnection(config.database);
 					connection.connect();
 
-					var command = "SELECT P.processName, P.idCensorResult, R.songName, R.artistName, R.url FROM censorResult R INNER JOIN censorResultProcess P ON P.idCensor = R.idCensor  WHERE R.idApi = ?";
+					var command = "SELECT P.processName, P.idCensorResult, R.songName, R.artistName, R.url, P.censorExcerpt FROM censorResult R INNER JOIN censorResultProcess P ON P.idCensor = R.idCensor WHERE R.idApi = ?";
 
 					connection.query(command, [
 						params.songId
@@ -54,7 +52,8 @@ var dbService = function(config){
 								var resultProcessed = results.reduce(function(final, result){
 									final.loadedCensorResult.push({
 										processName: result.processName,
-										resultId: result.idCensorResult
+										resultId: result.idCensorResult,
+										censorExcerpt: result.censorExcerpt
 									});
 
 									final.theSong.artistName = result.artistName;
@@ -63,6 +62,7 @@ var dbService = function(config){
 									final.theSong.lirics = null;
 									final.theSong.idiomID = null;
 									final.theSong.url = result.url;
+									final.theSong;
 
 									return final;
 								}, {
@@ -100,6 +100,8 @@ var dbService = function(config){
 					
 					if(censor.processName == '')
 						reject('The censor result ' + censorIndex + ' has no name process;');
+					if(censor.censorExcerpt == '')
+						reject('The censor result ' + censorIndex + ' has no excerpt;');
 					if(censor.idCensorResult == null || censor.idCensorResult == undefined)
 						reject('The censor result ' + censorIndex + ' has no result ID;');
 					if(typeof censor.idCensorResult != 'number')
@@ -133,11 +135,12 @@ var dbService = function(config){
 
 									params.censorResultList.forEach(function(censorResult){
 										connection.query(
-											'INSERT INTO censorResultProcess (idCensor, processName, idCensorResult) VALUES (?, ?, ?)',
+											'INSERT INTO censorResultProcess (idCensor, processName, idCensorResult, censorExcerpt) VALUES (?, ?, ?, ?)',
 											[
 												idCensor,
 												censorResult.processName,
-												censorResult.idCensorResult
+												censorResult.idCensorResult,
+												censorResult.censorExcerpt
 											]
 											, function (error, results, fields) {
 												if(error)

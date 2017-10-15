@@ -2,7 +2,9 @@
 	"general": {
 		"port": 3000,
 		"logPath": "/log",
-		"queryLimit": 5
+		"queryLimit": 5,
+		"resultCountBeforeCensor": 4,
+		"resultExcertpSize": 20
 	},
 
 	"api": {

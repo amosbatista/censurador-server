@@ -1,19 +1,19 @@
 
 var service = function(){
 
-
+	const config = require("../config");
 	const censorStatus = [
 		{
 			idCensorResult: 0,
 			feedBack: 'Apologia e exaltação da monarquia e outros regimes semelhantes.',
 			vowToCensor: true,
-			searchTerm: /(monar|rei|rainha|principe|princesa)/i
+			searchTerm: /(monar| rei |rainha|pr(i|í)ncipe|princesa)/i
 		},
 		{
 			idCensorResult: 0,
 			feedBack: 'Apologia e exaltação da monarquia e outros regimes semelhantes.',
 			vowToCensor: true,
-			searchTerm: /(king|queen|prince|princess)/i
+			searchTerm: /( king | queen | prince |princess)/i
 		},
 		{
 			idCensorResult: 1,
@@ -48,9 +48,19 @@ var service = function(){
 		},
 		filter: function(song){
 
-			return censorStatus.filter(function(censor){
-				return song.lirics.search(censor.searchTerm) > 0;
-			});
+			var censorResult = censorStatus.reduce(function(finalList, censor){
+				var excerptPosition = song.lirics.search(censor.searchTerm);
+
+				if(excerptPosition > 0){
+					censor.censorExcerpt = song.lirics.slice(excerptPosition - config.general.resultExcertpSize, excerptPosition + config.general.resultExcertpSize);
+					finalList.push(censor);
+				}
+
+				return finalList;
+
+			}, []);
+
+			return censorResult;
 		}
 	}
 }

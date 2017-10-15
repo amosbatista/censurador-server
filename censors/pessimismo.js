@@ -1,6 +1,7 @@
 
 var service = function(){
 
+	const config = require("../config");
 	const censorStatus = [
 		{
 			idCensorResult: 0,
@@ -56,9 +57,19 @@ var service = function(){
 		},
 		filter: function(song){
 
-			return censorStatus.filter(function(censor){
-				return song.lirics.search(censor.searchTerm) > 0;
-			});
+			var censorResult = censorStatus.reduce(function(finalList, censor){
+				var excerptPosition = song.lirics.search(censor.searchTerm);
+
+				if(excerptPosition > 0){
+					censor.censorExcerpt = song.lirics.slice(excerptPosition - config.general.resultExcertpSize, excerptPosition + config.general.resultExcertpSize);
+					finalList.push(censor);
+				}
+
+				return finalList;
+
+			}, []);
+
+			return censorResult;
 		}
 	}
 }

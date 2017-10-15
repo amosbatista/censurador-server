@@ -2,7 +2,7 @@
 	"commandList": [
 		{
 			"name": "resultProcess",
-			"command": "CREATE TABLE IF NOT EXISTS censorResultProcess (idCensor VARCHAR(50) NOT NULL, processName VARCHAR(50) NOT NULL, idCensorResult INT NOT NULL);"
+			"command": "CREATE TABLE IF NOT EXISTS censorResultProcess (idCensor VARCHAR(50) NOT NULL, processName VARCHAR(50) NOT NULL, idCensorResult INT NOT NULL, censorExcerpt VARCHAR(50) NOT NULL);"
 		},
 		{
 			"name": "result",

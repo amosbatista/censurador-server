@@ -5,7 +5,6 @@ var service = function(req, res, next){
 	var songAPI = require('./vagalumeAPI')(config);
 	var censorDataBaseModule = require("./censorDatabase_MySQL")(config);
 
-	console.log('query', req.query);
 	var songData = req.query;
 	var censorResultList = [];
 	var theSong;
@@ -47,7 +46,7 @@ var service = function(req, res, next){
 		else
 			censorResult.isSongFreeOfObjections = false;
 
-		if(censorResult.totalVowsToCensor > 3)
+		if(censorResult.totalVowsToCensor > config.general.resultCountBeforeCensor)
 			censorResult.isSongCensored = true;
 		else
 			censorResult.isSongCensored = false;
@@ -64,9 +63,6 @@ var service = function(req, res, next){
 	censorDataBaseModule.loadSong(songData).then(function(songFromDatabase){
 
 		if(songFromDatabase != null){
-			theSong = songFromDatabase.theSong;
-
-			console.log('The result loaded from database', songFromDatabase.loadedCensorResult);
 
 			songFromDatabase.loadedCensorResult.forEach(function(_censorResult){
 				var moduleToProcess = censorProcessorsModules.find(function(_censor){
@@ -75,12 +71,14 @@ var service = function(req, res, next){
 
 				if(moduleToProcess){
 					var censorResult = moduleToProcess.module.loadFromResult(_censorResult.resultId);
+					censorResult.censorExcerpt = _censorResult.censorExcerpt;
 					censorResultList.push(censorResult);
 				}
 				//censorResultList.push(censorProcessorsModules[_censorResult.processName].loadFromResult(_censorResult.idCensorResult));
 			});
 
-			console.log('The result processed from database', censorResultList);
+			songFromDatabase.theSong.censorResultList = censorResultList;
+			theSong = songFromDatabase.theSong;
 
 			resultProcess();
 		}
@@ -89,8 +87,6 @@ var service = function(req, res, next){
 			songAPI.loadSong(songData).then(function(songFromAPI){
 
 				theSong = songFromAPI;
-
-				console.log('The modules', censorProcessorsModules);
 
 				censorProcessorsModules.forEach(function(_censor){
 					var censorResult = _censor.module.filter(songFromAPI);
@@ -101,8 +97,6 @@ var service = function(req, res, next){
 
 					censorResultList = censorResultList.concat(censorResult);
 				});
-
-				console.log('The result', censorResultList);
 
 				songFromAPI.censorResultList = censorResultList;
 

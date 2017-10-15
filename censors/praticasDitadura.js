@@ -1,5 +1,6 @@
 var service = function(){
 	
+	const config = require("../config");
 	const censorStatus = [
 		{
 			idCensorResult: 0,
@@ -26,7 +27,7 @@ var service = function(){
 			idCensorResult: 3,
 			feedBack: 'Inverdades e faltas citações a procedimentos interrogatório das polícias nacionais.',
 			vowToCensor: true,
-			searchTerm: /(prend|mat[a-z]{1-5}|tortur|pers(eg|ig)|cadeia|pres(s|í))/i
+			searchTerm: /( prender |prisão|mat[a-z]{1-5}|tortur|pers(eg|ig)|cadeia|pres(s|í))/i
 		},
 
 		{
@@ -73,9 +74,19 @@ var service = function(){
 		},
 		filter: function(song){
 
-			return censorStatus.filter(function(censor){
-				return song.lirics.search(censor.searchTerm) > 0;
-			});
+			var censorResult = censorStatus.reduce(function(finalList, censor){
+				var excerptPosition = song.lirics.search(censor.searchTerm);
+
+				if(excerptPosition > 0){
+					censor.censorExcerpt = song.lirics.slice(excerptPosition - config.general.resultExcertpSize, excerptPosition + config.general.resultExcertpSize);
+					finalList.push(censor);
+				}
+
+				return finalList;
+
+			}, []);
+
+			return censorResult;
 		}
 	}
 }

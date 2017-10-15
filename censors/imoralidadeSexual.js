@@ -1,5 +1,6 @@
 var service = function(){
 	
+	const config = require("../config");
 	const censorStatus = [
 		{
 			idCensorResult: 0,
@@ -40,7 +41,7 @@ var service = function(){
 			idCensorResult:5,
 			feedBack: 'Colocação sutil ao ato sexual, citando o leito como meio de prepertar o ato.',
 			vowToCensor: true,
-			searchTerm: /(colch(a|ã)o|cama|leito|bed|lay down)/i
+			searchTerm: /(colch(a|ã)o|cama|leito| bed |lay down)/i
 		},
 		{
 			idCensorResult: 6,
@@ -58,27 +59,27 @@ var service = function(){
 			idCensorResult: 8,
 			feedBack: 'Comentário perjorativo sobre a parte posterior de uma pessoa.',
 			vowToCensor: true,
-			searchTerm: /(bund|bumbum|bum bum|poupan(c|ç)|ass|booty)/i
+			searchTerm: /( bund|bumbum|bum bum|poupan(c|ç)| ass |booty)/i
 		},
 
 		{
 			idCensorResult: 9,
 			feedBack: 'Personagem namorador, atrevido e sem pudor de seus atos.',
 			vowToCensor: true,
-			searchTerm: /(pegad(a|dor)|sanha|deng(o|ui))/i
+			searchTerm: /(pegad(a|dor)| (as)sanha( |d)|deng(o|ui))/i
 		},
 
 		{
 			idCensorResult:10,
 			feedBack: 'Descrição ofensiva à pessoa que nunca teve relações sexuais.',
 			vowToCensor: true,
-			searchTerm: /(caba(c|ç)|virg(e|in)|bv)/i
+			searchTerm: /(caba(c|ç)|virg(e|in)| bv )/i
 		},
 		{
 			idCensorResult:11,
-			feedBack: 'Locais promíscuos corruptores da juventude e dos bons costumes.',
+			feedBack: 'Locais e eventos promíscuos corruptores da juventude e dos bons costumes.',
 			vowToCensor: true,
-			searchTerm: /(balada|inferninho| pub |fest(a|inh)|curti|bord(e|é)(l|is)|party)/i
+			searchTerm: /(balada|inferninho| pub |fest(a|inh)|curti|bord(e|é)(l|is)|party|carnaval|folia|frevo)/i
 		},
 		{
 			idCensorResult:12,
@@ -90,7 +91,7 @@ var service = function(){
 			idCensorResult:13,
 			feedBack: 'Comportamento fogoso e libidinoso.',
 			vowToCensor: true,
-			searchTerm: /(paix(a|ã)o|(pra|vai) abalar|passion)/i
+			searchTerm: /(paix(a|ã)o|(pra|vai) abalar| passion )/i
 		},
 		{
 			idCensorResult:14,
@@ -120,19 +121,19 @@ var service = function(){
 			idCensorResult:18,
 			feedBack: 'Descrição de beijo, contato carnal pelos lábios.',
 			vowToCensor: true,
-			searchTerm: /(beij(o|a|ã)|kiss)/i
+			searchTerm: /(beij(o|a|ã)| kiss )/i
 		},
 		{
 			idCensorResult:20,
 			feedBack: 'Comentários explícitos sobre o corpo alheio.',
 			vowToCensor: true,
-			searchTerm: /cintur(a|in|waist|hip)/i
+			searchTerm: /cintur(a|in| waist | hip )/i
 		},
 		{
 			idCensorResult:21,
 			feedBack: 'Roupas e apetrechos íntimos/sexuais.',
 			vowToCensor: true,
-			searchTerm: /(cueca|calcinha|b(i|í)quin|suti(en|ã|an)|maiô|lingerie|pantie|bra)/i
+			searchTerm: /(cueca|calcinha|b(i|í)quin|suti(en|ã|an)|maiô|lingerie|pantie| bra )/i
 		},
 		{
 			idCensorResult:22,
@@ -151,9 +152,19 @@ var service = function(){
 		},
 		filter: function(song){
 
-			return censorStatus.filter(function(censor){
-				return song.lirics.search(censor.searchTerm) > 0;
-			});
+			var censorResult = censorStatus.reduce(function(finalList, censor){
+				var excerptPosition = song.lirics.search(censor.searchTerm);
+
+				if(excerptPosition > 0){
+					censor.censorExcerpt = song.lirics.slice(excerptPosition - config.general.resultExcertpSize, excerptPosition + config.general.resultExcertpSize);
+					finalList.push(censor);
+				}
+
+				return finalList;
+
+			}, []);
+
+			return censorResult;
 		}
 	}
 }
