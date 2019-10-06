@@ -19,7 +19,7 @@
 		"host": "localhost",
 		"database": "censor",
 		"user": "root",
-		"password": "amos"
+		"password": "root"
 	},
 
 	"censorProcessors": {
