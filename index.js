@@ -1,3 +1,4 @@
+require('dotenv').config();
 var config = require("./config");
 var serverSrv = require('./routeServer');
 //var ioSrv = require('./socketIo');

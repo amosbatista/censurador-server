@@ -1,10 +1,11 @@
 var dbService = function(config){
 
 	var mysql = require('mysql');
+	var databaseConfig = require('./databaseConfig')
 
 	return {
 		setupDatabase: function(){
-			var connection = mysql.createConnection(config.database);
+			var connection = mysql.createConnection(databaseConfig);
 			var databaseCommandList = require('./database_command_creation');
 			connection.connect();
 
@@ -31,7 +32,7 @@ var dbService = function(config){
 
 				try{
 
-					var connection = mysql.createConnection(config.database);
+					var connection = mysql.createConnection(databaseConfig);
 					connection.connect();
 
 					var command = "SELECT P.processName, P.idCensorResult, R.songName, R.artistName, R.url, P.censorExcerpt FROM censorResult R INNER JOIN censorResultProcess P ON P.idCensor = R.idCensor WHERE R.idApi = ?";
@@ -116,7 +117,7 @@ var dbService = function(config){
 
 					idGenerator().then(function(idCensor){
 
-						var connection = mysql.createConnection(config.database);
+						var connection = mysql.createConnection(databaseConfig);
 						connection.connect();
 						connection.query(
 							'INSERT INTO censorResult(idCensor, idApi, songName, artistName, censorDate, url) VALUES (?, ?, ?, ?, ?, ?)', 
@@ -175,7 +176,7 @@ var dbService = function(config){
 				
 				try{
 
-					var connection = mysql.createConnection(config.database);
+					var connection = mysql.createConnection(databaseConfig);
 					connection.connect();
 
 					var command = "SELECT artistName, idSearch, 'artist' AS type "
@@ -215,7 +216,7 @@ var dbService = function(config){
 				
 				try{
 
-					var connection = mysql.createConnection(config.database);
+					var connection = mysql.createConnection(databaseConfig);
 					connection.connect();
 
 					var command = "SELECT A.artistName, S.songName, S.idAPI, A.idSearch, 'song' as type "
@@ -262,7 +263,7 @@ var dbService = function(config){
 				
 				try{
 
-					var connection = mysql.createConnection(config.database);
+					var connection = mysql.createConnection(databaseConfig);
 					connection.connect();
 
 					var command = "SELECT S.songName, S.idAPI, 'song' as type "
@@ -312,7 +313,7 @@ var dbService = function(config){
 				
 				try{
 
-					var connection = mysql.createConnection(config.database);
+					var connection = mysql.createConnection(databaseConfig);
 					connection.connect();
 
 					var command = "SELECT S.songName, S.idAPI, 'song' as type "
@@ -352,7 +353,7 @@ var dbService = function(config){
 				if(!artistName || artistName == '')
 					reject('Artist name is null at saveArtistToCache');
 
-				var connection = mysql.createConnection(config.database);
+				var connection = mysql.createConnection(databaseConfig);
 				connection.connect();
 
 				var command = "SELECT idSearch "
@@ -408,7 +409,7 @@ var dbService = function(config){
 				if(!artistId || artistId == '')
 					reject('Artist ID is empty at save song to cache');
 
-				var connection = mysql.createConnection(config.database);
+				var connection = mysql.createConnection(databaseConfig);
 				connection.connect();
 
 				var command = "SELECT 1 "
