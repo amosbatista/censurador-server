@@ -141,15 +141,7 @@ var service = function(req, res, next){
 						});
 						
 						songFromAPI.censorResultList = censorResultList;
-
-						databaseModule.saveSong(songFromAPI).then(function(){
-							resultProcess();	
-						}).catch(function(err){
-							errorDeal({
-								errorMsg: 'Error at song save into database ',
-								errorObj: err
-							});
-						});
+						resultProcess();	
 					}).catch(function(err){
 						errorDeal(err);
 					});

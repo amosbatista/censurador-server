@@ -100,15 +100,8 @@ var service = function(req, res, next){
 
 				songFromAPI.censorResultList = censorResultList;
 
-				censorDataBaseModule.saveSong(songFromAPI).then(function(){
-					resultProcess();	
-				}).catch(function(err){
-					log.write("Error at song save into database: " + err);			
-					res.send({
-						errorMsg: 'Error at song save into database ',
-						errorObj: err
-					});
-				});
+				resultProcess();	
+
 
 			}).catch(function(loadSongLiricError){
 				log.write("Error at song liric load: " + loadSongLiricError);

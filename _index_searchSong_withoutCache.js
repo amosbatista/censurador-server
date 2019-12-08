@@ -58,8 +58,6 @@ var service = function(req, res, next){
 
 	songAPI.searchSongAndArtist(apiSearchQuery).then(function(apiResult){
 
-		_processCache(apiResult);
-
 		/* Result check. This entry can bring other result than the exact name*/
 		try{
 
