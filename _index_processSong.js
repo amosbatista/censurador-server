@@ -3,7 +3,7 @@ var service = function(req, res, next){
 	var config = require("./config");
 	var log = require('./logSrv')(config.general);
 	var songAPI = require('./vagalumeAPI')(config);
-	var censorDataBaseModule = require("./censorDatabase_MySQL")(config);
+	var censorDataBaseModule = require("./censorCache_NoCache")(config);
 
 	var songData = req.query;
 	var censorResultList = [];

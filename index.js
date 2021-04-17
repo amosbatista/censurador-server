@@ -40,7 +40,7 @@ serverSrv({
 	atStart: function(){
 
 		try{
-			var censorDataBaseModule = require("./censorDatabase_MySQL")(config);
+			var censorDataBaseModule = require("./censorCache_NoCache")(config);
 			censorDataBaseModule.setupDatabase();
 			log.write('Error at database start: ', err);
 		}

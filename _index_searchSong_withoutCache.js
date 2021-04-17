@@ -3,7 +3,7 @@ var service = function(req, res, next){
 	var config = require("./config");
 	var log = require('./logSrv')(config.general);
 	var songAPI = require('./vagalumeAPI')(config);
-	var cache = require('./censorDatabase_MySQL')(config);	
+	var cache = require('./censorCache_NoCache')(config);	
 	
 	var errorDeal = function(err){
 		log.write("Error at song search: " + JSON.stringify(err));
