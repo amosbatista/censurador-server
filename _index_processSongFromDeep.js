@@ -41,7 +41,7 @@ var service = function(req, res, next){
 	var censorProcessorsFolder = "./censors/";
 	var censorProcessorsModules;
 
-	var censorProcessorsModules = config.censorProcessors.process.reduce(function(_finalObject, _processConfig){
+	var censorProcessorsModules = config.censorProcessors.processDeepSong.reduce(function(_finalObject, _processConfig){
 		_finalObject[_processConfig.name] = require(censorProcessorsFolder + _processConfig.module)();
 		return _finalObject;
 	}, {});

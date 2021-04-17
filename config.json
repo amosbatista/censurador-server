@@ -35,7 +35,7 @@
 			"processSongFromDeepSearch": "/processFromDeepSearch"
 		},
 
-		"process__": [
+		"process": [
 			"7PalavrasProibidas",
 			"apologiaCrime",
 			"comunismo",
@@ -57,7 +57,7 @@
 			"ritmosDegenerados"
 		],
 
-		"process": [
+		"processDeepSong": [
 			{
 				"name": "7PalavrasProibidas",
 				"module": "7PalavrasProibidas"
